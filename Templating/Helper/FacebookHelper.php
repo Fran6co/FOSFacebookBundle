@@ -67,11 +67,24 @@ class FacebookHelper extends Helper
 
     public function loginButton($parameters = array(), $name = null)
     {
+        $loginParams = array('scope'=>implode(',', $this->permissions));
+        $logoutParams = array();
+
+        if(isset($parameters["login_url" ])){
+            $loginParams['redirect_uri'] = $parameters["login_url" ];
+            unset($parameters["login_url" ]);
+        }
+        if(isset($parameters["logout_url" ])){
+            $logoutParams["next"] = $parameters["logout_url" ];
+            unset($parameters["logout_url" ]);
+        }
+
         $name = $name ?: 'FOSFacebookBundle::loginButton.html.php';
         return $this->templating->render($name, $parameters + array(
-            'autologoutlink' => 'false',
-            'label'          => '',
-            'permissions'    => implode(',', $this->permissions),
+            "login_url"     => $this->facebook->getLoginUrl($loginParams),
+            "logout_url"    => $this->facebook->getLogoutUrl($logoutParams),
+            'login_label'    => 'Log In',
+            'logout_label'   => 'Logout',
         ));
     }
 
